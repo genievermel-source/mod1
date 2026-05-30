@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: retro
+      POSTGRES_USER: retro
+      POSTGRES_PASSWORD: retro
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U retro -d retro"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build: ./server
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: retro
+      POSTGRES_USER: retro
+      POSTGRES_PASSWORD: retro
+      PORT: 3001
+    ports:
+      - "3001:3001"
+
+  client:
+    build: ./client
+    depends_on:
+      - server
+    ports:
+      - "8081:80"
+
+volumes:
+  pgdata:
