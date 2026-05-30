@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: ai-pm-animation
-    env: static
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    pullRequestPreviewsEnabled: true
